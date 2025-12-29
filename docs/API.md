@@ -1,5 +1,63 @@
 # API Documentation
 
+This repo contains two related Python packages:
+
+- `brainwidemap`: IBL Brain Wide Map utilities (ONE-api based)
+- `neurothera_map`: receptor → circuit → activation integration primitives
+
+## neurothera_map
+
+### Top-level public API
+
+The top-level `neurothera_map` namespace exports a small set of stable types and helpers:
+
+```python
+import neurothera_map
+
+drug = neurothera_map.build_drug_profile("caffeine", mode="seed")
+```
+
+**Exports (high level):**
+
+- `RegionMap`, `ReceptorMap`, `ActivityMap`, `ConnectivityGraph`
+- `DrugInteraction`, `DrugProfile`
+- `build_drug_profile(...)`
+- `translate_to_human(...)`
+- `validate_against_pet_and_fmri(...)`
+
+See the smoke workflow in `tests/test_neurothera_public_api_smoke.py`.
+
+### Mouse helpers (`neurothera_map.mouse`)
+
+Mouse connectivity and MVP prediction live under `neurothera_map.mouse`:
+
+```python
+from neurothera_map.mouse import load_allen_connectivity, predict_mouse_effects
+```
+
+Key functions/classes:
+
+- `AllenConnectivityLoader`, `load_allen_connectivity(...)`
+- `ExpressionTableSpec`, `load_receptor_map_from_csv(...)`
+- `predict_mouse_effects(...)`
+
+Notes:
+
+- The connectivity loader supports an offline stub via `BWM_ALLEN_OFFLINE=1`.
+- Real `allensdk` integration requires `BWM_ALLEN_OFFLINE=0` and Python < 3.12.
+
+### Human helpers (`neurothera_map.human`)
+
+Human translation and validation live under `neurothera_map.human`:
+
+- `translate_to_human(...)`
+- `validate_against_pet_and_fmri(...)`
+- `load_human_pet_receptor_maps(...)`
+
+See `tests/test_neurothera_end_to_end_integration.py` for an offline end-to-end example.
+
+---
+
 ## DataLoader
 
 The `DataLoader` class provides access to Brain Wide Map data through the ONE-api.

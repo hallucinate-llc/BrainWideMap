@@ -1,17 +1,17 @@
-# Test Suite Documentation
+# Test Documentation
 
 ## Overview
 
-Comprehensive test suite for the drug database ingestion module, ensuring correct behavior across all components, edge cases, and integration scenarios.
+This document focuses on the **drug ingestion** test coverage (the `drug/` package and its adapters).
 
-## Test Statistics
+The repository also includes a broader deterministic test suite for `brainwidemap` and `neurothera_map`, plus opt-in live/E2E tests for real `allensdk` integration. For the overall test strategy and commands, see:
 
-- **Total Tests**: 56
-- **Pass Rate**: 100%
-- **Execution Time**: ~0.3 seconds
-- **Test Code**: 858 lines
-- **Production Code**: 867 lines (drug/*.py)
-- **Test-to-Code Ratio**: 0.99:1
+- `DEVELOPMENT.md`
+- `TEST_COVERAGE.md`
+
+## Scope note
+
+Any exact test counts / timings tend to drift as the repo evolves; prefer running `pytest --collect-only -q` or `pytest -q` locally if you need current numbers.
 
 ## Test Organization
 

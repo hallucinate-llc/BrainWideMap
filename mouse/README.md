@@ -123,4 +123,12 @@ See `examples/allen_connectivity_example.py` for complete examples including:
 
 - Many mouse datasets already use Allen CCF indexing. Prefer to preserve those IDs rather than invent a new ontology.
 - Always store "raw summary" and "analysis-ready normalized" versions.
-- Allen connectivity data requires network access for first download; subsequent loads use local cache.
+- The Allen connectivity loader supports two modes:
+  - **Offline stub** (deterministic, no network, no `allensdk`): set `BWM_ALLEN_OFFLINE=1` (this is what the default test suite uses).
+  - **Real allensdk** (uses Allen cache/manifest): set `BWM_ALLEN_OFFLINE=0` and install `allensdk` (Python < 3.12; Python 3.11 recommended). First run may require network access; later runs use local cache.
+
+For end-to-end validation of the real allensdk path, prefer:
+
+```bash
+bash scripts/run_e2e_allensdk.sh
+```
