@@ -81,6 +81,54 @@ Inter-space transforms / comparisons:
 - per-gene parcellated expression maps (careful normalization!)
 - gene sets per neurotransmitter system
 
+**Phase 2.2 MVP Implementation:**
+
+The `neurothera_map.human.transcriptomics` module provides tools for loading AHBA transcriptomic data:
+
+```python
+from neurothera_map.human import load_transcriptomic_map_from_csv
+
+# Load from offline parcellated CSV fixture
+rm = load_transcriptomic_map_from_csv(
+    "datasets/human_ahba_expression_fixture.csv",
+    genes=["DRD1", "DRD2", "HTR1A", "HTR2A"]
+)
+
+# Access gene expression by symbol
+drd1_map = rm.get("DRD1")
+print(drd1_map.region_ids)  # Parcellated regions
+print(drd1_map.values)      # Expression values
+```
+
+**Optional abagen integration** (requires separate installation):
+
+```python
+from neurothera_map.human import load_transcriptomic_map_with_abagen
+
+try:
+    # Load directly from AHBA via abagen (downloads data if needed)
+    rm = load_transcriptomic_map_with_abagen(
+        atlas="schaefer",
+        n_parcels=400,
+        genes=["DRD1", "DRD2"]
+    )
+except ImportError:
+    # Fallback to offline fixture if abagen not installed
+    rm = load_transcriptomic_map_from_csv("datasets/human_ahba_expression_fixture.csv")
+```
+
+Install abagen as optional dependency:
+```bash
+pip install abagen
+```
+
+**Features:**
+- Offline CSV loader (no downloads required for unit tests)
+- Optional `abagen` integration with soft dependency handling
+- Returns `ReceptorMap` keyed by gene symbol
+- Provenance metadata tracking
+- Support for both long and wide format CSVs
+
 ### 3.3 ActivityMaps (BIDS imaging)
 We provide a generic “BIDS → ActivityMap” interface:
 - user supplies GLM contrasts or precomputed statistical maps

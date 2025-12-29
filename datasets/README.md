@@ -133,6 +133,11 @@ Recommended processing:
 What we extract:
 - Region-level gene expression (with careful donor normalization)
 
+**Local fixtures:**
+- `human_ahba_expression_fixture.csv`: Sample parcellated expression data for testing (4 genes × 6 regions)
+  - Used for offline unit tests
+  - Real AHBA data can be loaded via `abagen` (optional dependency)
+
 ---
 
 ## Human (activation)
