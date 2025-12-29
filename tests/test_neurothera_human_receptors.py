@@ -88,6 +88,8 @@ def test_load_human_pet_receptor_maps_regionmap_structure():
 
 def test_load_human_pet_receptor_maps_specific_regions():
     """Test that specific regions are present in the fixture data."""
+    MIN_STRIATAL_D1_DENSITY = 0.5  # Striatal regions have high D1 receptor density
+
     receptor_map = load_human_pet_receptor_maps(
         "datasets/human_pet_receptor_fixture.csv",
         receptors=["D1"],
@@ -101,9 +103,13 @@ def test_load_human_pet_receptor_maps_specific_regions():
 
     # Striatal regions should be present and have high D1 density
     if "Left-Caudate" in region_dict:
-        assert region_dict["Left-Caudate"] > 0.5, "Caudate should have high D1 density"
+        assert (
+            region_dict["Left-Caudate"] > MIN_STRIATAL_D1_DENSITY
+        ), "Caudate should have high D1 density"
     if "Left-Putamen" in region_dict:
-        assert region_dict["Left-Putamen"] > 0.5, "Putamen should have high D1 density"
+        assert (
+            region_dict["Left-Putamen"] > MIN_STRIATAL_D1_DENSITY
+        ), "Putamen should have high D1 density"
 
 
 def test_load_human_pet_receptor_maps_custom_space():

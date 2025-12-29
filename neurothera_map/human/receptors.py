@@ -124,10 +124,12 @@ def _load_pet_receptor_long_format(
 
     # Group by receptor and create RegionMap for each
     for receptor, sub in work.groupby(spec.receptor_col, sort=True):
-        sub2 = sub[
-            [spec.region_col, spec.value_col]
-            + ([spec.uncertainty_col] if spec.uncertainty_col and spec.uncertainty_col in sub.columns else [])
-        ].copy()
+        # Select columns for this receptor's data
+        columns_to_select = [spec.region_col, spec.value_col]
+        if spec.uncertainty_col and spec.uncertainty_col in sub.columns:
+            columns_to_select.append(spec.uncertainty_col)
+
+        sub2 = sub[columns_to_select].copy()
 
         # Drop NaN values and aggregate duplicates by mean
         sub2 = sub2.dropna(subset=[spec.value_col])
@@ -169,19 +171,14 @@ def _load_pet_receptor_long_format(
     )
 
 
-def _check_hansen_receptors_available() -> bool:
+def _check_hansen_receptors_available() -> None:
     """Check if hansen_receptors package is available (soft dependency).
-
-    Returns:
-        True if hansen_receptors is available.
 
     Raises:
         ImportError if hansen_receptors is not installed.
     """
     try:
         import hansen_receptors  # noqa: F401
-
-        return True
     except ImportError as e:
         raise ImportError(
             "hansen_receptors package is not installed. "
