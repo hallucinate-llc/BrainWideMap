@@ -1,3 +1,85 @@
+# NeuroThera-Map
+
+
+A **cross-species “receptor → circuit → activation” integration toolkit** that helps you:
+
+- **Mouse mode:** combine brain-wide electrophysiology / imaging with **receptor & neurotransmitter biology** in Allen CCF space.
+- **Human mode:** translate candidate mechanisms into human brain spaces (MNI / fsaverage) using **PET receptor atlases**, transcriptomics, and multimodal imaging.
+- **Drug mode:** map a compound (e.g., caffeine, SSRIs) to **targets + affinities** (curated DBs), then propagate effects through **receptor distribution + connectivity** to generate testable hypotheses.
+- **Validation mode (paired with a separate AlphaFold package):**
+  - compare *AlphaFold-predicted binding* to *observed / predicted functional effects*,
+  - compute **mutual validation losses** and exchange gradients / constraints between machines.
+
+> Date created: 2025-12-28
+
+---
+
+## 0) What this repo is (and isn’t)
+
+**This repo focuses on brain- and receptor-level integration and validation.**  
+It does **not** do structural prediction, docking, or protein folding. Those live in your separate AlphaFold package.
+
+This repo also does **not** claim clinical efficacy. It is a research toolkit to generate and validate mechanistic hypotheses.
+
+---
+
+## 1) Repository map
+
+- `datasets/README.md` — dataset catalog + access points + what each dataset contributes.
+- `pipelines/README.md` — ingestion + harmonization plan (mouse + human).
+- `mouse/README.md` — mouse-specific workflows (IBL / Allen / tracing / CCF alignment).
+- `human/README.md` — human translation workflows (PET receptor maps, AHBA, OpenNeuro).
+- `drug/README.md` — drug/target/affinity ingestion + normalization.
+- `validation/README.md` — AlphaFold ↔ NeuroThera-Map mutual validation design.
+- `orchestration/README.md` — multi-machine topology + message schema for feedback loops.
+- `governance/README.md` — licensing, provenance, ethics, and citation expectations.
+- `docs/README.md` — comprehensive implementation plan with milestones and deliverables.
+
+---
+
+## 2) Core idea (data model)
+
+Everything is expressed as a small set of interoperable objects (stored in Parquet/Zarr/NWB/BIDS as appropriate):
+
+- **RegionMap**: values indexed by atlas regions (mouse CCF; human parcellation).
+- **VoxelMap / SurfaceMap**: dense maps (volumetric MNI, surface fsaverage/fsLR).
+- **ReceptorMap**: receptor/transporters density or expression (gene or PET).
+- **ActivityMap**: task/condition activation (spikes, calcium, fMRI, IEG).
+- **ConnectivityGraph**: directed weighted edges between regions/cell classes.
+- **DrugProfile**: targets + affinities + mechanism metadata + uncertainty.
+
+---
+
+## 3) Quickstart (developer ergonomics)
+
+This repo is designed to be “VSCode-friendly”: each subfolder has a README that can be used as a step-by-step build spec for an agent or developer.
+
+Suggested minimal environment:
+
+- Python 3.11+
+- `poetry` or `uv`
+- `pydantic` (schemas), `numpy`, `pandas`, `pyarrow`, `xarray`, `zarr`
+- `nwb` tooling (`pynwb`) for electrophysiology packages (optional)
+- `bids` tooling (`pybids`, `nilearn`) for human imaging (optional)
+
+Implementation guidance and milestones live in `docs/README.md`.
+
+---
+
+## 4) How this integrates with your AlphaFold package
+
+The two packages communicate via a **stable exchange schema**:
+
+- From AlphaFold → NeuroThera-Map:
+  - predicted target list, predicted binding energies/affinities, binding-site uncertainty
+- From NeuroThera-Map → AlphaFold:
+  - receptor candidates prioritized by circuit relevance,
+  - functional constraints (which targets “should” affect which circuits),
+  - observed effect signatures to penalize structurally-plausible-but-functionally-wrong predictions.
+
+Details: `validation/README.md` and `orchestration/README.md`.
+
+
 # Brain Wide Map Data Science Utilities
 
 A comprehensive Python toolkit for exploring and analyzing the International Brain Laboratory's Brain Wide Map dataset - a large-scale neurophysiology dataset of mouse decision-making across 241 brain regions.
