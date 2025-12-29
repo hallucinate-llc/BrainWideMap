@@ -1,9 +1,14 @@
 from __future__ import annotations
 
 from dataclasses import asdict
+from enum import Enum
 from typing import Any, Dict, Iterable, List, Literal, Optional, Tuple
 
 from ..core.types import DrugInteraction, DrugProfile
+
+
+# Default evidence score for interactions with missing evidence
+_DEFAULT_EVIDENCE_SCORE = 0.0
 
 
 def _normalize_name(name: str) -> str:
@@ -63,10 +68,14 @@ def _convert_drug_profile(
         affinity_nM = interaction.get_best_potency_nm()
         
         # Map interaction type to action string
-        action = interaction.interaction_type.value if hasattr(interaction.interaction_type, 'value') else str(interaction.interaction_type)
+        # Handle both enum types (with .value) and string types
+        if isinstance(interaction.interaction_type, Enum):
+            action = interaction.interaction_type.value
+        else:
+            action = str(interaction.interaction_type)
         
-        # Get evidence score
-        evidence = interaction.evidence_score if interaction.evidence_score is not None else 0.0
+        # Get evidence score with default fallback
+        evidence = interaction.evidence_score if interaction.evidence_score is not None else _DEFAULT_EVIDENCE_SCORE
         
         # Get source database
         source = interaction.source_database if interaction.source_database else "ingestion"
