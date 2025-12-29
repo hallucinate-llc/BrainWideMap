@@ -13,12 +13,11 @@ import pytest
 from neurothera_map.core.types import ActivityMap
 from neurothera_map.human.activity import (
     NIBABEL_AVAILABLE,
-    NILEARN_AVAILABLE,
     activity_map_from_parcellated_table,
 )
 
 # Check if optional dependencies are available for NIfTI tests
-NIFTI_SUPPORT = NIBABEL_AVAILABLE and NILEARN_AVAILABLE
+NIFTI_SUPPORT = NIBABEL_AVAILABLE
 
 
 @pytest.fixture
@@ -228,7 +227,7 @@ def test_activity_map_default_name_from_filename():
             specific_path.unlink()
 
 
-@pytest.mark.skipif(not NIFTI_SUPPORT, reason="nibabel and nilearn not available")
+@pytest.mark.skipif(not NIFTI_SUPPORT, reason="nibabel not available")
 def test_nifti_import_available():
     """Test that NIfTI support is available when dependencies are installed."""
     from neurothera_map.human.activity import activity_map_from_nifti
@@ -237,7 +236,7 @@ def test_nifti_import_available():
     assert callable(activity_map_from_nifti)
 
 
-@pytest.mark.skipif(NIFTI_SUPPORT, reason="Testing behavior without nibabel/nilearn")
+@pytest.mark.skipif(NIFTI_SUPPORT, reason="Testing behavior without nibabel")
 def test_nifti_import_error_when_not_available():
     """Test that appropriate error is raised when NIfTI dependencies are missing."""
     from neurothera_map.human.activity import activity_map_from_nifti

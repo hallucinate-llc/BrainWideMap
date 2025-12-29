@@ -23,13 +23,6 @@ try:
 except ImportError:
     NIBABEL_AVAILABLE = False
 
-try:
-    import nilearn
-
-    NILEARN_AVAILABLE = True
-except ImportError:
-    NILEARN_AVAILABLE = False
-
 
 def activity_map_from_parcellated_table(
     path: Union[str, Path],
@@ -56,7 +49,6 @@ def activity_map_from_parcellated_table(
     Raises:
         FileNotFoundError: If the specified file does not exist
         ValueError: If required columns are missing or data is invalid
-        pd.errors.ParserError: If the file cannot be parsed
 
     Examples:
         >>> # Load from CSV with default columns
@@ -75,10 +67,7 @@ def activity_map_from_parcellated_table(
         raise FileNotFoundError(f"File not found: {path}")
 
     # Load the table
-    try:
-        df = pd.read_csv(path)
-    except Exception as e:
-        raise pd.errors.ParserError(f"Failed to parse file {path}: {e}") from e
+    df = pd.read_csv(path)
 
     # Validate columns
     if region_col not in df.columns:
@@ -91,23 +80,21 @@ def activity_map_from_parcellated_table(
         )
 
     # Extract and validate data
-    regions = df[region_col].astype(str).to_numpy()
-    values = df[value_col].to_numpy(dtype=float)
-
-    # Check for invalid values
-    if len(regions) == 0:
+    # Note: Convert to str after filtering NaNs to avoid 'nan' strings
+    region_series = df[region_col]
+    value_series = df[value_col]
+    
+    # Check for empty table
+    if len(region_series) == 0:
         raise ValueError("Table contains no data rows")
-
-    # Remove rows with NaN values
-    valid_mask = ~(pd.isna(regions) | pd.isna(values))
-    if not valid_mask.all():
-        n_invalid = (~valid_mask).sum()
-        regions = regions[valid_mask]
-        values = values[valid_mask]
-        # Note: We silently drop invalid rows but could warn
-
-    if len(regions) == 0:
+    
+    # Remove rows with NaN values before conversion
+    valid_mask = ~(region_series.isna() | value_series.isna())
+    if valid_mask.sum() == 0:
         raise ValueError("No valid (non-NaN) region-value pairs found in table")
+    
+    regions = region_series[valid_mask].astype(str).to_numpy()
+    values = value_series[valid_mask].to_numpy(dtype=float)
 
     # Build provenance information
     provenance: Dict[str, Any] = {
@@ -135,8 +122,8 @@ def activity_map_from_nifti(
 ) -> ActivityMap:
     """Create an ActivityMap from a NIfTI volume using an atlas for parcellation.
 
-    This function requires nibabel and nilearn to be installed. If these
-    libraries are not available, an ImportError will be raised.
+    This function requires nibabel to be installed. If this library is not
+    available, an ImportError will be raised.
 
     Args:
         nifti_path: Path to the NIfTI file containing activity/activation data
@@ -150,12 +137,12 @@ def activity_map_from_nifti(
         ActivityMap with parcellated values from the NIfTI volume
 
     Raises:
-        ImportError: If nibabel or nilearn are not installed
+        ImportError: If nibabel is not installed
         FileNotFoundError: If specified files do not exist
         ValueError: If aggregation method is not supported
 
     Examples:
-        >>> # Requires nibabel and nilearn to be installed
+        >>> # Requires nibabel to be installed
         >>> am = activity_map_from_nifti(
         ...     "activation_map.nii.gz",
         ...     "atlas.nii.gz",
@@ -167,11 +154,6 @@ def activity_map_from_nifti(
         raise ImportError(
             "nibabel is required for NIfTI support. "
             "Install with: pip install nibabel"
-        )
-    if not NILEARN_AVAILABLE:
-        raise ImportError(
-            "nilearn is required for NIfTI support. "
-            "Install with: pip install nilearn"
         )
 
     nifti_path = Path(nifti_path)
