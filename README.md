@@ -1,11 +1,64 @@
 # BrainWideMap
 
-This repository contains two related Python toolkits:
+This repository contains two related Python toolkits.
+
+If you’re new here: the goal is to make it easy to go from **brain-wide activity data** (what changed in which regions) to **mechanistic hypotheses** (which receptors/targets and circuits could explain it), with a workflow that stays testable and reproducible.
+
+## Why this exists
+
+In practice, mechanistic “brain → receptor → circuit” work often gets stuck because:
+
+- Your data sources live in different ecosystems (IBL sessions, Allen connectivity, receptor maps, human PET), each with their own formats.
+- You can compute results, but it’s hard to keep the *data model* consistent and validate that components still work together over time.
+- Live dependencies (network downloads, optional SDKs) make tests flaky and discourage end-to-end coverage.
+
+This repo addresses that by:
+
+- Providing small, explicit **core types** (region-indexed maps and connectivity graphs) that you can pass between steps.
+- Keeping the **default test suite deterministic and offline**, while also providing opt-in **live/E2E tests** that validate real external integrations.
+
+## What you can do with it
+
+Common use cases:
+
+- Explore IBL Brain Wide Map sessions and compute region-level summaries.
+- Build a lightweight drug/target profile and generate a toy prediction pipeline.
+- Load a mouse connectivity graph (offline stub or real Allen SDK) and propagate effects through circuits.
+- Translate a region-indexed prediction into a human space and run simple validation utilities.
+
+## Packages in this repo
+
+There are two packages, used for different jobs:
 
 - **brainwidemap**: utilities for exploring and analyzing the International Brain Laboratory (IBL) Brain Wide Map dataset via ONE-api.
 - **neurothera_map**: a dependency-light “receptor → circuit → activation” integration toolkit (mouse ↔ human translation + validation primitives).
 
 Both live in the same Python distribution (installed as `brainwidemap`), and are tested together.
+
+## How it works (conceptual)
+
+At a high level, `neurothera_map` encourages a simple, composable pipeline:
+
+1. Represent your data as **region-indexed arrays** (`ActivityMap`, `ReceptorMap`).
+2. Load or construct a **ConnectivityGraph** (offline stub for tests, or real Allen SDK for real runs).
+3. (Optional) Build a **DrugProfile** (targets/affinities).
+4. Combine/propagate these pieces to get a predicted activity signature.
+5. Translate/validate the result in a human space.
+
+This is intentionally not “one big model” — it’s a small set of interoperable building blocks.
+
+## Workflow: chemical → brain hypothesis
+
+If your goal is “I have a chemical/drug; help me reason about how it could modulate the brain,” start here:
+
+- [docs/WORKFLOW.md](docs/WORKFLOW.md)
+
+That guide walks through:
+
+- Building a `DrugProfile` (chemical → targets)
+- Building a `ReceptorMap` (targets → regional susceptibility)
+- Loading a `ConnectivityGraph` (circuits; offline stub or real Allen SDK)
+- Predicting a mouse `ActivityMap` and translating/validating in human space
 
 ## Quickstart
 

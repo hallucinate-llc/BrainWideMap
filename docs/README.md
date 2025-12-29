@@ -1,3 +1,22 @@
+# Docs
+
+## Start here
+
+If you want to use this repo to analyze how **chemicals interact with the brain**, follow the end-to-end walkthrough:
+
+- `docs/WORKFLOW.md`
+
+If you want the reference API surface:
+
+- `docs/API.md`
+
+If you want the deterministic vs live/E2E test story:
+
+- `DEVELOPMENT.md`
+- `TEST_COVERAGE.md`
+
+---
+
 # Implementation Plan (Comprehensive)
 
 This document is written to be “agent-ready”: it’s an executable plan for building the toolkit with minimal ambiguity.
